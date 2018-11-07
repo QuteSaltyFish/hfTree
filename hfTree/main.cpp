@@ -23,5 +23,18 @@ int main(int argc, const char * argv[]) {
     {
         cout<< result[i].data<<' '<<result[i].code<<endl;
     }
+    
+    cout<<tree.getDepth()<<endl;;
+    for (int i=1; i<14;++i)
+    {
+//        if (tree.getParent(i)==0)
+        {
+            cout<<tree.getParent(i)<<' '<<tree.getData(i)<<' '<<tree.getLeftChild(i)<<' '<<tree.getRightChild(i)<<endl;
+        }
+    }
+    
+    
+    tree.ShowTreeMap();
+
     return 0;
 }

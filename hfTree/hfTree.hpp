@@ -10,6 +10,8 @@
 #define hfTree_hpp
 
 #include <iostream>
+#include <cmath>
+
 using namespace std;
 
 template <class T>
@@ -36,7 +38,102 @@ public:
     hfTree(const T *x, const int *w, int size);
     void getCode(hfCode result[]);  //从哈夫曼树生成哈夫曼编码
     ~hfTree(){delete [] elem;}
+    
+    int getDepth(int flag=1);
+    
+    T** getTreeMap(T **map);
+    T getData(int index)
+    {
+        return elem[index].data;
+    }
+    
+    int getLeftChild(int index)
+    {
+        return elem[index].left;
+    }
+    
+    int getRightChild(int index)
+    {
+        return elem[index].right;
+    }
+    
+    int getParent(int index)
+    {
+        return elem[index].parent;
+    }
+    void fitCode(T** map, int index, int x, int y, int depth);
+    void ShowTreeMap();
 };
+
+template <class T>
+void hfTree<T>::ShowTreeMap()
+{
+    T** map = nullptr;
+    map =getTreeMap(map);
+    for (int i=0; i<getDepth(); ++i)
+    {
+        for (int j=0; j<pow(2,getDepth())-1; ++j)
+            cout<<map[i][j]<<' ';
+        cout<<endl;
+    }
+    delete []map;
+}
+
+template <class T>
+int hfTree<T>::getDepth(int index)
+{
+    int depth = 0;
+    if (index!=0)
+    {
+        int leftDepth = getDepth(elem[index].left);
+        int rightDepth = getDepth(elem[index].right);
+        depth = leftDepth > rightDepth ? leftDepth+1 : rightDepth+1;
+    }
+    return depth;
+}
+
+template <class T>
+void hfTree<T>::fitCode(T** map,int index, int x, int y, int depth)
+{
+    int left =elem[index].left;
+    int right = elem[index].right;
+    if (left == 0 && right == 0)    //  if the node is a leaf node then put in its value;
+        map[x][y]=elem[index].data;
+    else if (left!=0)
+    {
+        map[x][y]='#';
+        fitCode(map, left, x+1, y-pow(2, depth-2-x), depth);
+    }
+    if (right!=0)
+    {
+        map[x][y]='#';
+        fitCode(map, right, x+1, y+pow(2, depth-2-x), depth);
+    }
+}
+
+template <class T>
+T** hfTree<T>::getTreeMap(T **map)
+{
+    //initiate the tree map
+    int row = getDepth();
+    int col = pow(2, row)-1;
+    map = new T*[row];
+    for (int i =0; i<row; ++i)
+    {
+        map[i] = new T[col];
+    }
+    for (int i=0; i<row; ++i)
+    {
+        for (int j=0; j<col; ++j)
+        {
+            map[i][j] = ' ';
+        }
+    }
+    
+    //start the assignment job
+    fitCode(map, 1, 0, pow(2,row-1)-1, row);
+    return map;
+}
 
 template <class T>
 hfTree<T>::hfTree(const T *v, const int *w, int size)
